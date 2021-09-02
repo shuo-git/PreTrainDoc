@@ -12,13 +12,13 @@ Fork Fairseq最新版本，已实现对Fairscale的集成。
 
 ###### commit 431620876aeaadddcd6bf075a7ac38b2fc3917c3
 
-嵌入Huggingface mT5的tokenizer，可以直接处理plain text。现在实现的版本比较丑陋，需要在代码里手动预设mT5 tokenizer的位置，后续需要进一步优化。
+嵌入Huggingface mT5的tokenizer，可以直接处理plain text。现在实现的版本比较丑陋，需要在代码里手动预设mT5 tokenizer的位置，后续需要进一步优化。目前已验证可用的tokenizer路径为：[thu119-3] /data/private/ws/DATASET/Medical/mT5_tokenizer
 
 ### 环境
 
 使用**docker**配置环境，已安装的库包括（仅列举常用库）
 
-```
+```shell
 fairseq
 fairscale
 transformers
