@@ -12,24 +12,27 @@ Fork Fairseq最新版本，已实现对Fairscale的集成。
 
 ###### commit 431620876aeaadddcd6bf075a7ac38b2fc3917c3
 
-嵌入Huggingface mT5的tokenizer，可以直接处理plain text。现在实现的版本比较丑陋，需要在代码里手动预设mT5 tokenizer的位置，后续需要进一步优化。目前已验证可用的tokenizer路径为：[thu119-3] /data/private/ws/DATASET/Medical/mT5_tokenizer
+嵌入Huggingface mT5的tokenizer，可以直接处理plain text。现在实现的版本比较丑陋，需要在代码里手动预设mT5 tokenizer的位置，后续需要进一步优化。目前已验证可用的tokenizer路径为：[thu102] /data/private/ws/DATASET/Medical/mT5_tokenizer
 
 ### 环境
 
-使用**docker**配置环境，已安装的库包括（仅列举常用库）
+基础镜像：
 
 ```shell
-fairseq
-fairscale
-transformers
-sentencepiece
+docker pull gyxthu17/cpm-2:1.1
 ```
 
-Docker镜像位置：[thu119-3] /home/ws/fairseq-shuo-v0.3.tar
+已下载好并存储在本地路径：
+
+```shell
+[thu102] /data/private/ws/cpm-2.tar
+```
+
+运行此`docker`需要安装`nvidia-docker`，详情请参照`RunMegatron.md`中相关介绍。在[thu102]服务器上安装好后，运行`nvidia-docker`碰到一些小问题，记不清了，根据报错信息搜一下比较好解决。
 
 #### 安装细节
 
-Fairseq安装
+##### Fairseq安装
 
 ```shell
 git clone git@github.com:shuo-git/fairseq-pretrain.git
@@ -37,7 +40,7 @@ cd fairseq-pretrain
 pip install -e .
 ```
 
-Faiseqscale安装
+##### Faiseqscale安装
 
 ```shell
 git clone git@github.com:facebookresearch/fairscale.git
@@ -47,13 +50,15 @@ pip install pytest # 否则fairscale会报错
 pip uninstall numpy && pip install numpy # 重新安装适配的numpy版本，否则fairscale会报错
 ```
 
-transformers & sentencepiece 安装
+##### transformers & sentencepiece 安装
 
 ```shell
 pip install transformers
 pip install sentencepiece
 export TOKENIZERS_PARALLELISM=false # 解决sentencepiece tokenizer可能死锁的警告
 ```
+
+##### 测试
 
 该环境在在清华服务器[thu102]上已经测试可以进行语言模型的training和validation。仅测试单机多卡，测试脚本如下：
 
@@ -74,8 +79,9 @@ CUDA_VISIBLE_DEVICES=6,7 fairseq-train test-data-bin --ddp-backend fully_sharded
 
 #### 后续
 
-1. 制作Dockerfile
-2. 在智源服务器上运行起来
-3. 多机多卡开发
-4. FSDP有效性验证
+1. 解决环境中less/vim/终端中文乱码问题
+2. 制作Dockerfile
+3. 在智源服务器上运行起来
+4. 多机多卡开发
+5. FSDP有效性验证
 
