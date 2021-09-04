@@ -32,7 +32,11 @@ docker pull gyxthu17/cpm-2:1.1
 
 #### 安装细节
 
-##### Fairseq安装
+##### 安装过程
+
+已更新到Dockerfile中
+
+###### Fairseq安装
 
 ```shell
 git clone git@github.com:shuo-git/fairseq-pretrain.git
@@ -40,7 +44,7 @@ cd fairseq-pretrain
 pip install -e .
 ```
 
-##### Faiseqscale安装
+###### Faiseqscale安装
 
 ```shell
 git clone git@github.com:facebookresearch/fairscale.git
@@ -50,7 +54,7 @@ pip install pytest # 否则fairscale会报错
 pip uninstall numpy && pip install numpy # 重新安装适配的numpy版本，否则fairscale会报错
 ```
 
-##### transformers & sentencepiece 安装
+###### transformers & sentencepiece 安装
 
 ```shell
 pip install transformers
@@ -58,14 +62,14 @@ pip install sentencepiece
 export TOKENIZERS_PARALLELISM=false # 解决sentencepiece tokenizer可能死锁的警告
 ```
 
-##### 测试
+###### 测试
 
 该环境在在清华服务器[thu102]上已经测试可以进行语言模型的training和validation。仅测试单机多卡，测试脚本如下：
 
 ```shell
 docker_data=/data/private/ws/DATASET
 docker_code=/home/ws
-docker_image=fairseq-pretrain:v0.0
+docker_image=fairseq-pretrain:v0.3
 # 进入docker环境
 nvidia-docker run --ipc=host --net=host --dns 8.8.8.8 -v $docker_data:$docker_data -v $docker_code:$docker_code -p 6000:6000  -it $docker_image bash
 # 进入工作路径
@@ -73,14 +77,94 @@ cd /data/private/ws/DATASET/Medical
 # 将原始数据处理为二进制文件（无需进行spm和bpe等操作）
 fairseq-preprocess --only-source --trainpref head.txt --validpref head.txt --destdir test-data-bin --workers 4
 # 语言模型训练，设置--ddp-backend fully_sharded时打开fairscale加速
-CUDA_VISIBLE_DEVICES=6,7 fairseq-train test-data-bin --ddp-backend fully_sharded --fp16 --fp16-init-scale 4 --task language_modeling --tokens-per-sample 1024 --batch-size 8 --arch transformer_lm --optimizer adam --adam-betas "(0.9,0.98)" --lr 0.0001 --lr-scheduler polynomial_decay --warmup-updates 5 --total-num-update 10 --max-update 10 --log-format json --log-interval 1
+CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train test-data-bin --ddp-backend fully_sharded --fp16 --fp16-init-scale 4 --task language_modeling --tokens-per-sample 1024 --batch-size 8 --arch transformer_lm --optimizer adam --adam-betas "(0.9,0.98)" --lr 0.0001 --lr-scheduler polynomial_decay --warmup-updates 5 --total-num-update 10 --max-update 10 --log-format json --log-interval 1
 # 假如不想保存checkpoint，上述命令可加"--no-save"
 ```
 
-#### 后续
+##### 制作Dockerfile
 
-1. 解决环境中less/vim/终端中文乱码问题
-2. 制作Dockerfile
+```dockerfile
+FROM fairseq-pretrain:v0.0
+
+ENV LESSCHARSET UTF-8
+ENV DEBIAN_FRONTEND noninteractive
+
+COPY vimrc /root/.vimrc
+
+# sources.list为对应ubuntu版本镜像源
+COPY sources.list /etc/apt/sources.list
+RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
+    tree sysstat mtr ntpdate dos2unix zip unzip
+RUN apt-get -y -o Dpkg::Options::="--force-overwrite" install ibverbs-providers
+
+RUN pip --no-cache-dir install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+RUN pip --no-cache-dir install jupyter notebook keras sklearn pandas matplotlib -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+RUN python -m ipykernel install --user --name base --display-name "Python3.8"
+
+COPY prepare.sh /root/.jupyter/prepare.sh
+RUN chmod +x /root/.jupyter/prepare.sh && mkdir -p /dataset /workspace /logs /model
+EXPOSE 8888
+
+RUN pip install future typing packaging -i https://pypi.tuna.tsinghua.edu.cn/simple
+# 安装openmpi
+# RUN mkdir /tmp/openmpi && \
+#     cd /tmp/openmpi && \
+#     wget https://www.open-mpi.org/software/ompi/v4.0/downloads/openmpi-4.0.0.tar.gz && \
+#     tar zxf openmpi-4.0.0.tar.gz && \
+#     cd openmpi-4.0.0 && \
+#     ./configure --enable-orterun-prefix-by-default && \
+#     make -j $(nproc) all && \
+#     make install && \
+#     ldconfig && \
+#     rm -rf /tmp/openmpi
+
+# 安装fairseq
+ADD fairseq-pretrain /root/fairseq-pretrain
+WORKDIR /root/fairseq-pretrain
+RUN pip install -e ./ -i https://pypi.tuna.tsinghua.edu.cn/simple
+# 安装fairscale
+ADD fairscale /root/fairscale
+WORKDIR /root/fairscale
+RUN pip install -e ./ -i https://pypi.tuna.tsinghua.edu.cn/simple && pip uninstall --yes numpy && pip install --no-input numpy pytest -i https://pypi.tuna.tsinghua.edu.cn/simple
+# 安装transformers & sentencepiece
+RUN pip install transformers sentencepiece -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+ADD mT5_tokenizer /root/mT5_tokenizer
+ENV TOKENIZERS_PARALLELISM=false 
+
+# 安装ssh服务
+RUN apt-get install -y --no-install-recommends openssh-client openssh-server && \
+    mkdir -p /var/run/sshd
+
+RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_config.new && \
+    echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config.new && \
+    mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config &&\
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config
+
+EXPOSE 22
+
+
+# 安装horovod，支持分布式部署
+# RUN ldconfig /usr/local/cuda/targets/x86_64-linux/lib/stubs && \
+#     pip install --no-cache-dir horovod==0.20.0 -i https://pypi.tuna.tsinghua.edu.cn/simple && \
+#     ldconfig
+# CMD ["/bin/bash"]
+
+WORKDIR /root
+```
+
+##### 导出镜像
+
+```shell
+docker save fairseq-pretrain:v0.3 | gzip > health-fairseq-v0.3.tar.gz
+```
+
+### 后续
+
+1. ~~解决环境中less/vim/终端中文乱码问题~~
+2. ~~制作Dockerfile~~
 3. 在智源服务器上运行起来
 4. 多机多卡开发
 5. FSDP有效性验证

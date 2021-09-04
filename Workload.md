@@ -12,7 +12,7 @@
 
 | 成员          | 少   | 中   | 大   |
 | ------------- | ---- | ---- | ---- |
-| Shuo Wang     | 2    | 3    | 2    |
+| Shuo Wang     | 2    | 4    | 2    |
 | Qinhong Zhou  | 1    | 1    | 0    |
 | Rui Jiao      | 1    | 1    | 1    |
 | Xiangzhe Kong | 0    | 2    | 0    |
@@ -38,4 +38,5 @@
 |      |           | 配置智源平台运行环境   | 配置Mega.LM+DS并制作Docker          | Rui          | 大     |
 |      |           | 配置智源平台运行环境   | 配置Fairseq+Fairscale并制作Docker   | Shuo         | 大     |
 |      |           | 配置v100运行环境       | 在智源平台运行成功Fairseq+Fairscale | Shuo         | 大     |
+|      |           | 制作Dockerfile         | 制作Dockerfile便于后续使用          | Shuo         | 中     |
 
