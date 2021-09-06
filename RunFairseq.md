@@ -69,7 +69,7 @@ export TOKENIZERS_PARALLELISM=false # 解决sentencepiece tokenizer可能死锁�
 ```shell
 docker_data=/data/private/ws/DATASET
 docker_code=/home/ws
-docker_image=fairseq-pretrain:v0.3
+docker_image=fairseq-pretrain:v0.4
 # 进入docker环境
 nvidia-docker run --ipc=host --net=host --dns 8.8.8.8 -v $docker_data:$docker_data -v $docker_code:$docker_code -p 6000:6000  -it $docker_image bash
 # 进入工作路径
@@ -77,7 +77,7 @@ cd /data/private/ws/DATASET/Medical
 # 将原始数据处理为二进制文件（无需进行spm和bpe等操作）
 fairseq-preprocess --only-source --trainpref head.txt --validpref head.txt --destdir test-data-bin --workers 4
 # 语言模型训练，设置--ddp-backend fully_sharded时打开fairscale加速
-CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train test-data-bin --ddp-backend fully_sharded --fp16 --fp16-init-scale 4 --task language_modeling --tokens-per-sample 1024 --batch-size 8 --arch transformer_lm --optimizer adam --adam-betas "(0.9,0.98)" --lr 0.0001 --lr-scheduler polynomial_decay --warmup-updates 5 --total-num-update 10 --max-update 10 --log-format json --log-interval 1
+CUDA_VISIBLE_DEVICES=1,2 fairseq-train test-data-bin --ddp-backend fully_sharded --fp16 --fp16-init-scale 4 --task language_modeling --tokens-per-sample 1024 --batch-size 8 --arch transformer_lm --optimizer adam --adam-betas "(0.9,0.98)" --lr 0.0001 --lr-scheduler polynomial_decay --warmup-updates 5 --total-num-update 10 --max-update 10 --log-format json --log-interval 1
 # 假如不想保存checkpoint，上述命令可加"--no-save"
 ```
 
@@ -86,16 +86,17 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 fairseq-train test-data-bin --ddp-backend fully_sha
 ```dockerfile
 FROM fairseq-pretrain:v0.0
 
-ENV LESSCHARSET UTF-8
 ENV DEBIAN_FRONTEND noninteractive
 
 COPY vimrc /root/.vimrc
+COPY tmux.conf /root/.tmux.conf
 
 # sources.list为对应ubuntu版本镜像源
 COPY sources.list /etc/apt/sources.list
 RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
-    tree sysstat mtr ntpdate dos2unix zip unzip
-RUN apt-get -y -o Dpkg::Options::="--force-overwrite" install ibverbs-providers
+    tree sysstat mtr ntpdate dos2unix zip unzip zsh
+RUN apt-get remove -y librdmacm1 libibverbs1 ibverbs-providers && apt-get install -y librdmacm1 libibverbs1 ibverbs-providers
+# RUN apt-get -y -o Dpkg::Options::="--force-overwrite" install ibverbs-providers
 
 RUN pip --no-cache-dir install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
 
@@ -132,7 +133,6 @@ RUN pip install -e ./ -i https://pypi.tuna.tsinghua.edu.cn/simple && pip uninsta
 RUN pip install transformers sentencepiece -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 ADD mT5_tokenizer /root/mT5_tokenizer
-ENV TOKENIZERS_PARALLELISM=false 
 
 # 安装ssh服务
 RUN apt-get install -y --no-install-recommends openssh-client openssh-server && \
@@ -141,8 +141,9 @@ RUN apt-get install -y --no-install-recommends openssh-client openssh-server && 
 RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_config.new && \
     echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config.new && \
     mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config &&\
-    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config
-
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config &&\
+    sed -i 's/Port 2222/Port 22/g' /etc/ssh/sshd_config &&\
+    sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/g' /etc/ssh/sshd_config
 EXPOSE 22
 
 
@@ -152,13 +153,18 @@ EXPOSE 22
 #     ldconfig
 # CMD ["/bin/bash"]
 
+# 配置oh-my-zsh
 WORKDIR /root
+ADD oh-my-zsh /root/.oh-my-zsh
+ADD install.sh /root/install.sh
+ADD environment.config /root/environment.config
+# 登陆docker之后，如需要安装oh-my-zsh: 1. sh /root/install.sh; 2. cat /root/environment.config >> /root/.zshrc; 3. source /root/.zshrc
 ```
 
 ##### 导出镜像
 
 ```shell
-docker save fairseq-pretrain:v0.3 | gzip > health-fairseq-v0.3.tar.gz
+docker save fairseq-pretrain:v0.4 | gzip > health-fairseq-v0.4.tar.gz
 ```
 
 ### 后续

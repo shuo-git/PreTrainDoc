@@ -12,8 +12,8 @@
 
 | 成员          | 少   | 中   | 大   |
 | ------------- | ---- | ---- | ---- |
-| Shuo Wang     | 2    | 4    | 2    |
-| Qinhong Zhou  | 1    | 1    | 0    |
+| Shuo Wang     | 3    | 3    | 3    |
+| Qinhong Zhou  | 1    | 2    | 0    |
 | Rui Jiao      | 1    | 1    | 1    |
 | Xiangzhe Kong | 0    | 2    | 0    |
 
@@ -25,8 +25,10 @@
 | ---- | --------- | ----------------------- | --------------------------------- | ------------------------- | ------ |
 | 2021 | 8.20-8.26 | 8篇 医疗+预训练 论文    | 熟悉医疗+预训练主流模型与评测方法 | Shuo/Qinhong/Rui/Xiangzhe | 中     |
 |      | 8.27-9.02 | CPM-1 CPM-2             | 借鉴CPM大规模模型的组织经验       | Shuo/Xiangzhe             | 中     |
+|      |           | kNN-based NMT           | 学习其知识表示方法                | Qinhong                   | 中     |
 |      | 9.03-9.09 | Megatron-LM相关论文 4篇 | 学习大规模预训练模型研究思路      |                           |        |
 |      | 9.10-9.16 | Megatron-LM相关论文 4篇 | 学习大规模预训练模型研究思路      |                           |        |
+|      |           | 中文QA论文              |                                   |                           |        |
 
 ### 工程任务
 
@@ -38,5 +40,6 @@
 |      |           | 配置智源平台运行环境   | 配置Mega.LM+DS并制作Docker          | Rui          | 大     |
 |      |           | 配置智源平台运行环境   | 配置Fairseq+Fairscale并制作Docker   | Shuo         | 大     |
 |      |           | 配置v100运行环境       | 在智源平台运行成功Fairseq+Fairscale | Shuo         | 大     |
-|      |           | 制作Dockerfile         | 制作Dockerfile便于后续使用          | Shuo         | 中     |
+|      |           | 制作Dockerfile         | 制作Dockerfile便于后续使用          | Shuo         | 大     |
+|      |           | 数据预处理             | 使用mT5 tokenizer，二进制化         | Shuo         | 小     |
 
