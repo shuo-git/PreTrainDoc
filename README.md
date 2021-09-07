@@ -5,14 +5,15 @@
 #### 数据
 
 * ~~讨论医疗数据格式设计~~
-* ~~数据二进制化~~（参考https://fairseq.readthedocs.io/en/latest/getting_started.html#sharding-very-large-datasets）
+* ~~数据二进制化~~
 
 #### 实验
 
 * 345M模型 + 医疗对话数据
-  * 训练参数确定
-  * FSDP有效性验证
-  * ZeRO不同stage测试
+  * ~~训练参数确定~~
+  * ~~FSDP有效性验证~~
+  * ~~ZeRO不同stage测试~~
+  * 训练进行中
 * 345M模型 + 医疗&通用数据
   * 下游任务评测
   * 不同数据使用方法效果实验，确定最终数据方案
@@ -29,7 +30,7 @@
 ### 研究任务
 
 * 潜在研究方向
-  * Datastore-based medical pre-trained model (沁泓介绍)
+  * Datastore-based medical pre-trained model
 * 潜在研究任务
   * QA
 * 医疗预训练模型存在的问题

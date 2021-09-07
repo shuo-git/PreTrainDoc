@@ -123,10 +123,10 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
     fairseq-train $data_bin \
     --ddp-backend legacy_ddp \
     --fp16 --fp16-init-scale 4 --checkpoint-activations \
-    --distributed-world-size 8 --model-parallel-size 2 \
+    --distributed-world-size 8 --model-parallel-size 8 \
     --criterion vocab_parallel_cross_entropy \
-    --task language_modeling --tokens-per-sample 1024 --batch-size 1 --update-freq 2 \
-    --arch transformer_lm_gpt2_big_model_parallel --share-decoder-input-output-embed \
+    --task language_modeling --tokens-per-sample 1024 --batch-size 1 --update-freq 8 \
+    --arch transformer_lm_gpt3_6_7_model_parallel --share-decoder-input-output-embed \
     --optimizer adam --adam-betas "(0.9, 0.98)" \
     --weight-decay 1e-2 --clip-norm 1.0 \
     --lr 1.5e-4 --min-lr 1e-5 --lr-scheduler cosine-megatron --warmup-updates 3200 \
@@ -136,7 +136,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
     --log-format json --log-interval 1 | tee -a train.log
 ```
 
-**注意**：Fairseq现有框架中，Model parallel无法和ZeRO技术结合使用，根据<a href="https://huggingface.co/transformers/parallelism.html#zero-data-parallel">此Blog</a>描述，当多个node之间的通信非常快速时，仅使用ZeRO即可，无需结合Model parallel和ZeRO。我们在智源的服务器之间是有IB卡的，仅用ZeRO即可。后续有需求可以集成Model parallel和ZeRO-S1
+**注意**：Fairseq现有框架中，Model parallel无法和ZeRO技术结合使用，根据<a href="https://huggingface.co/transformers/parallelism.html#zero-data-parallel">此Blog</a>描述，当多个node之间的通信非常快速时，仅使用ZeRO即可，无需结合Model parallel和ZeRO。我们在智源的服务器之间是有IB卡的，仅用ZeRO即可。后续有需求可以集成Model parallel和ZeRO-S1。
 
 ###### FSDP效果实验
 
