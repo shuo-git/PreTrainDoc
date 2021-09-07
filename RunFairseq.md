@@ -10,9 +10,13 @@ Fork Fairseq最新版本，已实现对Fairscale的集成。
 
 #### 开发记录
 
-###### commit 431620876aeaadddcd6bf075a7ac38b2fc3917c3
+###### commit 7c2f5128
 
 嵌入Huggingface mT5的tokenizer，可以直接处理plain text。现在实现的版本比较丑陋，需要在代码里手动预设mT5 tokenizer的位置，后续需要进一步优化。目前已验证可用的tokenizer路径为：[thu102] /data/private/ws/DATASET/Medical/mT5_tokenizer
+
+###### commit 64819ef5
+
+实现了Megatron-LM的learning rate schedule，使用方式为`--lr-scheduler cosine-megatron`。
 
 ### 环境
 
@@ -97,7 +101,9 @@ OMP_NUM_THREADS=20 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
     --optimizer adam --adam-betas "(0.9,0.98)" \
     --weight-decay 1e-2 --clip-norm 1.0 \
     --lr 1.5e-4 --min-lr 1e-5 --lr-scheduler cosine-megatron --warmup-updates 3200 \
-    --lr-period-updates 316800 --max-update 500000 \
+    --lr-period-updates 96800 --max-update 100000 \
+    --save-interval 1 --keep-last-epochs 3 \
+    --save-interval-updates 1000 --keep-interval-updates 100 \
     --log-format json --log-interval 1 | tee -a train.log
 ```
 
