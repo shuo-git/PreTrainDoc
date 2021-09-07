@@ -77,8 +77,28 @@ cd /data/private/ws/DATASET/Medical
 # 将原始数据处理为二进制文件（无需进行spm和bpe等操作）
 fairseq-preprocess --only-source --trainpref head.txt --validpref head.txt --destdir test-data-bin --workers 4
 # 语言模型训练，设置--ddp-backend fully_sharded时打开fairscale加速
-CUDA_VISIBLE_DEVICES=1,2 fairseq-train test-data-bin --ddp-backend fully_sharded --fp16 --fp16-init-scale 4 --task language_modeling --tokens-per-sample 1024 --batch-size 8 --arch transformer_lm --optimizer adam --adam-betas "(0.9,0.98)" --lr 0.0001 --lr-scheduler polynomial_decay --warmup-updates 5 --total-num-update 10 --max-update 10 --log-format json --log-interval 1
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 fairseq-train chunyu-dialog-bin --ddp-backend fully_sharded --fp16 --fp16-init-scale 4 --task language_modeling --tokens-per-sample 2048 --batch-size 8 --arch transformer_lm --optimizer adam --adam-betas "(0.9,0.98)" --lr 0.0001 --lr-scheduler polynomial_decay --warmup-updates 5 --total-num-update 10000 --max-update 10000 --log-format json --log-interval 1
 # 假如不想保存checkpoint，上述命令可加"--no-save"
+```
+
+###### 训练
+
+```shell
+# 345M model training 超参设置参考 https://github.com/NVIDIA/Megatron-LM/blob/3860e995269df61d234ed910d4756e104e1ab844/examples/pretrain_gpt.sh
+# --ddp-backend 设置为fully_sharded时等效开启ZeRO stage 1
+# --no-reshard-after-forward 打开时等效ZeRO stage 2
+data_bin=/dataset/98bda4fa/DATASET/chunyu-dialog/chunyu-dialog-bin
+OMP_NUM_THREADS=20 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
+    fairseq-train $data_bin \
+    --ddp-backend fully_sharded --no-reshard-after-forward \
+    --fp16 --fp16-init-scale 4 --checkpoint-activations \
+    --task language_modeling --tokens-per-sample 1024 --batch-size 32 --update-freq 2 \
+    --arch transformer_lm_gpt2_small \
+    --optimizer adam --adam-betas "(0.9,0.98)" \
+    --weight-decay 1e-2 --clip-norm 1.0 \
+    --lr 1.5e-4 --min-lr 1e-5 --lr-scheduler cosine-megatron --warmup-updates 3200 \
+    --lr-period-updates 316800 --max-update 500000 \
+    --log-format json --log-interval 1 | tee -a train.log
 ```
 
 ##### 制作Dockerfile
