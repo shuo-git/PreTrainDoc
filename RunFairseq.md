@@ -197,7 +197,7 @@ docker save fairseq-pretrain:v0.4 | gzip > health-fairseq-v0.4.tar.gz
 
 1. ~~解决环境中less/vim/终端中文乱码问题~~
 2. ~~制作Dockerfile~~
-3. 在智源服务器上运行起来
-4. 多机多卡开发
-5. FSDP有效性验证
+3. ~~在智源服务器上运行起来~~
+4. ~~FSDP有效性验证~~
+5. 多机多卡开发
 
