@@ -107,6 +107,58 @@ OMP_NUM_THREADS=20 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
     --log-format json --log-interval 1 | tee -a train.log
 ```
 
+###### Model Parallel
+
+准备工作
+
+```shell
+git submodule update --init fairseq/model_parallel/megatron
+```
+
+Model Parallel with Data Parallel 参考<a href="https://github.com/pytorch/fairseq/tree/master/examples/megatron_11b">此处</a>
+
+```shell
+data_bin=/dataset/98bda4fa/DATASET/chunyu-dialog/chunyu-dialog-bin
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
+    fairseq-train $data_bin \
+    --ddp-backend legacy_ddp \
+    --fp16 --fp16-init-scale 4 --checkpoint-activations \
+    --distributed-world-size 8 --model-parallel-size 2 \
+    --criterion vocab_parallel_cross_entropy \
+    --task language_modeling --tokens-per-sample 1024 --batch-size 1 --update-freq 2 \
+    --arch transformer_lm_gpt2_big_model_parallel --share-decoder-input-output-embed \
+    --optimizer adam --adam-betas "(0.9, 0.98)" \
+    --weight-decay 1e-2 --clip-norm 1.0 \
+    --lr 1.5e-4 --min-lr 1e-5 --lr-scheduler cosine-megatron --warmup-updates 3200 \
+    --lr-period-updates 96800 --max-update 100000 \
+    --save-interval 1 --keep-last-epochs 3 \
+    --save-interval-updates 1000 --keep-interval-updates 100 \
+    --log-format json --log-interval 1 | tee -a train.log
+```
+
+**注意**：Fairseq现有框架中，Model parallel无法和ZeRO技术结合使用，根据<a href="https://huggingface.co/transformers/parallelism.html#zero-data-parallel">此Blog</a>描述，当多个node之间的通信非常快速时，仅使用ZeRO即可，无需结合Model parallel和ZeRO。我们在智源的服务器之间是有IB卡的，仅用ZeRO即可。后续有需求可以集成Model parallel和ZeRO-S1
+
+###### FSDP效果实验
+
+* V100 32G x 8
+* Max length = 1024
+* Batch size = 8 in total
+* GPU memory (MiB)
+
+| Model       | #Param. | w/o ZeRO            | Effect of ZeRo-S1       | Effect of ZeRO-S2      |
+| ----------- | ------- | ------------------- | ----------------------- | ---------------------- |
+| GPT2-small  | 0.43B   | 10251               | 4805 \| **5446 less**   | 5469 \| **4782 less**  |
+| GPT2-medium | 0.87B   | 19763               | 7713 \| **12050 less**  | 8865 \| **10898 less** |
+| GPT2-big    | 1.46B   | 23411 **mp=2 uf=2** | 10099 \| **13312 less** | 13911 \| **9500 less** |
+
+* Speed (tokens per second)
+
+| Model       | #Param. | w/o ZeRO | Effect of ZeRo-S1           | Effect of ZeRO-S2          |
+| ----------- | ------- | -------- | --------------------------- | -------------------------- |
+| GPT2-small  | 0.43B   | 19606.1  | 14739.6 \| **24.8% slower** | 18757.8 \| **4.3% slower** |
+| GPT2-medium | 0.87B   | 10203.8  | 7901.5 \| **22.6% slower**  | 10265.1 \| **0.6% faster** |
+| GPT2-big    | 1.46B   | 5805.1   | 4464.3 \| **23.1% slower**  | 6175.5 \| **6.4% faster**  |
+
 ##### 制作Dockerfile
 
 ```dockerfile
