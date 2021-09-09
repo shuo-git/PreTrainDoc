@@ -13,7 +13,7 @@
 | 成员          | 少   | 中   | 大   |
 | ------------- | ---- | ---- | ---- |
 | Shuo Wang     | 3    | 4    | 4    |
-| Qinhong Zhou  | 1    | 2    | 0    |
+| Qinhong Zhou  | 1    | 2    | 1    |
 | Rui Jiao      | 1    | 1    | 1    |
 | Xiangzhe Kong | 0    | 2    | 0    |
 
@@ -44,6 +44,6 @@
 |      |           | 制作Dockerfile         | 制作Dockerfile便于后续使用          | Shuo         | 大     |
 |      |           | 数据预处理             | 使用mT5 tokenizer，二进制化         | Shuo         | 小     |
 |      |           | 在智源服务器上运行实验 | 在智源服务器上运行实验              | Shuo         | 中     |
-|      |           | 多机多卡调试           | 跑通多机多卡                        | Qinhong      |        |
+|      |           | 多机多卡调试           | 跑通多机多卡                        | Qinhong      | 大     |
 |      |           | FSDP有效性验证         | 初步理解并验证FSDP有效性            | Shuo         | 大     |
 
