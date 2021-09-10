@@ -16,6 +16,7 @@
 | Qinhong Zhou  | 1    | 2    | 1    |
 | Rui Jiao      | 1    | 1    | 1    |
 | Xiangzhe Kong | 0    | 2    | 0    |
+| Zeyuan Yang   | 0    | 0    | 0    |
 
 
 

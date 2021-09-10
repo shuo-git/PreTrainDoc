@@ -145,7 +145,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
 * Batch size = 8 in total
 * GPU memory (MiB)
 
-| Model       | #Param. | w/o ZeRO            | Effect of ZeRo-S1       | Effect of ZeRO-S2      |
+| Model       | #Param. | w/o ZeRO            | Effect of ZeRo-S3       | Effect of ZeRO-S2      |
 | ----------- | ------- | ------------------- | ----------------------- | ---------------------- |
 | GPT2-small  | 0.43B   | 10251               | 4805 \| **5446 less**   | 5469 \| **4782 less**  |
 | GPT2-medium | 0.87B   | 19763               | 7713 \| **12050 less**  | 8865 \| **10898 less** |
@@ -153,7 +153,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
 
 * Speed (tokens per second)
 
-| Model       | #Param. | w/o ZeRO | Effect of ZeRo-S1           | Effect of ZeRO-S2          |
+| Model       | #Param. | w/o ZeRO | Effect of ZeRo-S3           | Effect of ZeRO-S2          |
 | ----------- | ------- | -------- | --------------------------- | -------------------------- |
 | GPT2-small  | 0.43B   | 19606.1  | 14739.6 \| **24.8% slower** | 18757.8 \| **4.3% slower** |
 | GPT2-medium | 0.87B   | 10203.8  | 7901.5 \| **22.6% slower**  | 10265.1 \| **0.6% faster** |
@@ -251,5 +251,5 @@ docker save fairseq-pretrain:v0.4 | gzip > health-fairseq-v0.4.tar.gz
 2. ~~制作Dockerfile~~
 3. ~~在智源服务器上运行起来~~
 4. ~~FSDP有效性验证~~
-5. 多机多卡开发
+5. ~~多机多卡开发~~
 
