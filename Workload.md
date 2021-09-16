@@ -13,7 +13,7 @@
 | 成员          | 少   | 中   | 大   |
 | ------------- | ---- | ---- | ---- |
 | Shuo Wang     | 4    | 4    | 4    |
-| Qinhong Zhou  | 1    | 2    | 1    |
+| Qinhong Zhou  | 1    | 3    | 1    |
 | Rui Jiao      | 1    | 1    | 3    |
 | Xiangzhe Kong | 0    | 2    | 0    |
 | Zeyuan Yang   | 0    | 0    | 0    |
@@ -48,4 +48,5 @@
 |      |           | 多机多卡调试             | 跑通多机多卡                        | Qinhong      | 大     |
 |      |           | FSDP有效性验证           | 初步理解并验证FSDP有效性            | Shuo         | 大     |
 |      | 9.10-9.16 | gpt2small验收&数据预处理 |                                     | Shuo         | 少     |
+|      |           | 多机多卡+ZeRO测试        |                                     | Qinhong      | 中     |
 
