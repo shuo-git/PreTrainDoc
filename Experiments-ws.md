@@ -16,5 +16,7 @@ cat train.log | grep "train | {\"epoch\":"
 cat train.log | grep "valid |"
 ```
 
-### 20210915 通用数据
+### 20210915 加入泽远收集数据
+
+
 

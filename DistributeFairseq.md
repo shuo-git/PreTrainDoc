@@ -16,7 +16,7 @@ health-wangshuo-fairseq-pretrain version: v4
 * 默认登录的是master服务器，通过`/home/hostfile.json`，可以找到master和slaves的IP地址（slave可以直接ssh登录）
 * master节点参考脚本如下（nnodes设成总结点数，master上node_rank设为0，master_addr为master的ip，master_port找一个空闲的port即可）
 
-```
+```shell
 data_bin=/dataset/98bda4fa/DATASET/chunyu-dialog/chunyu-dialog-bin
 OMP_NUM_THREADS=20
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
@@ -82,5 +82,4 @@ wps统计
   `git submodule update --init fairseq/model_parallel/megatron`
 
 * 在脚本里加入`--model-parallel-size`，表示total number of GPUs to parallelize model over。试了试设成2，卡死了
-
 

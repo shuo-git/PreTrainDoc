@@ -96,11 +96,11 @@ OMP_NUM_THREADS=20 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \
     fairseq-train $data_bin \
     --ddp-backend fully_sharded --no-reshard-after-forward \
     --fp16 --fp16-init-scale 4 --checkpoint-activations \
-    --task language_modeling --tokens-per-sample 1024 --batch-size 32 --update-freq 2 \
+    --task language_modeling --tokens-per-sample 1024 --batch-size 4 --update-freq 1 \
     --arch transformer_lm_gpt2_small \
     --optimizer adam --adam-betas "(0.9,0.98)" \
     --weight-decay 1e-2 --clip-norm 1.0 \
-    --lr 1.5e-4 --min-lr 1e-5 --lr-scheduler cosine-megatron --warmup-updates 3200 \
+    --lr 1.5e-4 --min-lr 1e-5 --lr-scheduler cosine --warmup-updates 3200 \
     --lr-period-updates 96800 --max-update 100000 \
     --save-interval 1 --keep-last-epochs 3 \
     --save-interval-updates 1000 --keep-interval-updates 100 \
