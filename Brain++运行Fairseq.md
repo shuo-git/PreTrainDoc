@@ -6,7 +6,7 @@
 sudo -i
 ```
 
-修改/root/environment.config，将其中的PATH=XXX改为PATH=$PATH/XXX，否则将无法使用rlaunch等，并添加`alias python=/opt/conda/bin/python`以修改python路径
+修改/root/environment.config，将其中的PATH=XXX改为PATH=XXX:$PATH（注意就是这个顺序），否则将无法使用rlaunch等，python位置也会出错
 配置zsh
 
 ```shell
