@@ -59,6 +59,6 @@
 |      | 11.06-12.03 | 数据预处理                | 已完成                              | Qinhong             | 中     |
 |      |             | RoBERTa训练               | 进行中                              | Rui                 | 中     |
 |      |             | BART训练                  | 进行中                              | Shuo                | 中     |
-|      |             | RoBERTa评测               | 进行中                              | Xiangzhe            | 中     |
-|      |             | BART评测                  | 进行中                              | Zhicheng            | 中     |
+|      |             | RoBERTa评测               | 进行中                              | Xiangzhe            | 大     |
+|      |             | BART评测                  | 进行中                              | Zhicheng            | 大     |
 
