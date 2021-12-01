@@ -6,6 +6,7 @@
 sudo -i
 ```
 
+修改/root/environment.config，将其中的PATH=XXX改为PATH=XXX:$PATH（注意就是这个顺序），否则将无法使用rlaunch等，python位置也会出错
 配置zsh
 
 ```shell
